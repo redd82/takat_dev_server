@@ -1,0 +1,92 @@
+# SSH Server Configuration Template for Ubuntu 24.04
+# Save as /etc/ssh/sshd_config on your Ubuntu server
+
+# Basic settings
+Port 22
+Protocol 2
+AddressFamily any
+ListenAddress 0.0.0.0
+
+# Host keys
+HostKey /etc/ssh/ssh_host_rsa_key
+HostKey /etc/ssh/ssh_host_ecdsa_key
+HostKey /etc/ssh/ssh_host_ed25519_key
+
+# Ciphers and algorithms
+Ciphers aes256-gcm@openssh.com,chacha20-poly1305@openssh.com,aes256-ctr
+MACs hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com
+KexAlgorithms curve25519-sha256@libssh.org,diffie-hellman-group16-sha512
+
+# Logging
+SyslogFacility AUTH
+LogLevel INFO
+
+# Authentication
+LoginGraceTime 120
+PermitRootLogin no
+StrictModes yes
+MaxAuthTries 3
+MaxSessions 10
+
+# Public key authentication
+PubkeyAuthentication yes
+AuthorizedKeysFile .ssh/authorized_keys
+
+# Password authentication (disable after setting up keys)
+PasswordAuthentication no
+PermitEmptyPasswords no
+
+# Challenge-response authentication
+ChallengeResponseAuthentication no
+
+# Kerberos authentication
+KerberosAuthentication no
+
+# GSSAPI authentication
+GSSAPIAuthentication no
+
+# PAM authentication
+UsePAM yes
+
+# X11 forwarding
+X11Forwarding no
+X11DisplayOffset 10
+PrintMotd no
+PrintLastLog yes
+
+# TCP keep alive
+TCPKeepAlive yes
+
+# Client alive
+ClientAliveInterval 300
+ClientAliveCountMax 2
+
+# Banner
+#Banner /etc/issue.net
+
+# Subsystem
+Subsystem sftp /usr/lib/openssh/sftp-server
+
+# User restrictions
+AllowUsers YOUR_USERNAME
+
+# Group restrictions (optional)
+#AllowGroups ssh-users developers
+
+# Deny users (if needed)
+#DenyUsers baduser
+
+# Rate limiting
+MaxStartups 10:30:60
+
+# Compression
+Compression delayed
+
+# Environment
+AcceptEnv LANG LC_*
+
+# Security settings
+PermitUserEnvironment no
+PermitTunnel no
+GatewayPorts no
+PermitOpen any

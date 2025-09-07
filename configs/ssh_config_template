@@ -1,0 +1,65 @@
+# SSH Client Configuration Template
+
+# Default settings for all hosts
+Host *
+    ServerAliveInterval 60
+    ServerAliveCountMax 3
+    Compression yes
+    ForwardAgent no
+    AddKeysToAgent yes
+    UseKeychain yes
+
+# Development server configuration template
+# Copy this section and modify for your server
+Host mydevserver
+    HostName YOUR_SERVER_IP_OR_DOMAIN
+    User YOUR_USERNAME
+    Port 22
+    IdentityFile ~/.ssh/id_ed25519
+    ForwardAgent yes
+    ServerAliveInterval 60
+    ServerAliveCountMax 3
+    Compression yes
+    # Port forwarding for common development ports
+    LocalForward 8000 localhost:8000
+    LocalForward 5432 localhost:5432
+    LocalForward 3000 localhost:3000
+
+# Example configuration for multiple servers
+Host prod-server
+    HostName production.example.com
+    User deploy
+    Port 22
+    IdentityFile ~/.ssh/id_ed25519_prod
+    ForwardAgent no
+    
+Host staging-server
+    HostName staging.example.com
+    User deploy
+    Port 22
+    IdentityFile ~/.ssh/id_ed25519_staging
+    ForwardAgent no
+
+# GitHub configuration
+Host github.com
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/id_ed25519_github
+    
+# GitLab configuration
+Host gitlab.com
+    HostName gitlab.com
+    User git
+    IdentityFile ~/.ssh/id_ed25519_gitlab
+
+# Jump host configuration example
+Host internal-server
+    HostName 192.168.1.100
+    User developer
+    ProxyJump bastion-host
+    IdentityFile ~/.ssh/id_ed25519
+
+Host bastion-host
+    HostName bastion.example.com
+    User ubuntu
+    IdentityFile ~/.ssh/id_ed25519_bastion
