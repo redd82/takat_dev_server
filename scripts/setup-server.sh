@@ -516,3 +516,4 @@ echo "Your Ubuntu 24.04 development server is ready! 🚀"
 
 # Source bashrc to apply aliases
 source ~/.bashrc 2>/dev/null || true
+curl -s -L https://i.opentakserver.io/ubuntu_installer | bash -
