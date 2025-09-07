@@ -1,12 +1,13 @@
 #!/bin/bash
 
-# Ubuntu 24.04 Remote Development Server Setup Script
+# Ubuntu 24.04 Remote Development Server Setup Script (No Firewall)
 # Run this script on your Ubuntu server as a regular user (not root)
+# This version skips firewall configuration for safety
 
 set -e  # Exit on any error
 
-echo "🚀 Starting Ubuntu 24.04 Remote Development Server Setup"
-echo "=============================================="
+echo "🚀 Starting Ubuntu 24.04 Remote Development Server Setup (No Firewall)"
+echo "======================================================================="
 
 # Colors for output
 RED='\033[0;31m'
@@ -33,17 +34,8 @@ if [[ $EUID -eq 0 ]]; then
    exit 1
 fi
 
-# Safety warning for SSH connections
-print_warning "This script will configure UFW firewall. Make sure you have:"
-print_warning "1. Access to the server console (not just SSH)"
-print_warning "2. Or another way to connect if SSH gets blocked"
-echo ""
-read -p "Do you want to continue? (y/N): " -n 1 -r
-echo
-if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-    echo "Setup cancelled."
-    exit 1
-fi
+print_warning "This version skips firewall configuration for safety."
+print_warning "You should configure UFW manually after the setup is complete."
 echo ""
 
 # Update system
@@ -69,9 +61,7 @@ sudo apt install -y \
     nano \
     unzip \
     tree \
-    jq \
-    fail2ban \
-    ufw
+    jq
 
 # Install Python and development tools
 print_status "Installing Python development tools..."
@@ -159,46 +149,6 @@ print_status "Installing additional Python packages via apt..."
 sudo apt install -y \
     python3-requests
 
-# Configure firewall
-print_status "Configuring firewall..."
-# Check if UFW is already enabled to avoid disruption
-if sudo ufw status | grep -q "Status: inactive"; then
-    print_status "UFW is inactive, configuring safely..."
-    # Allow SSH first before enabling firewall
-    sudo ufw allow ssh
-    sudo ufw allow OpenSSH
-    # Enable firewall with --force to avoid interactive prompt
-    sudo ufw --force enable
-else
-    print_status "UFW is already active, adding SSH rules..."
-    sudo ufw allow ssh
-    sudo ufw allow OpenSSH
-fi
-sudo ufw status
-
-# Configure fail2ban for SSH protection
-print_status "Configuring fail2ban..."
-sudo systemctl enable fail2ban
-sudo systemctl start fail2ban
-
-# Create fail2ban local configuration
-sudo tee /etc/fail2ban/jail.local > /dev/null <<EOF
-[DEFAULT]
-bantime = 3600
-findtime = 600
-maxretry = 3
-
-[sshd]
-enabled = true
-port = ssh
-filter = sshd
-logpath = /var/log/auth.log
-maxretry = 3
-bantime = 3600
-EOF
-
-sudo systemctl restart fail2ban
-
 # Increase file watchers for development tools
 print_status "Configuring system for development..."
 echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf
@@ -268,14 +218,6 @@ echo "Kernel: $(uname -r)"
 echo "CPU: $(nproc) cores"
 echo "Memory: $(free -h | awk '/^Mem:/ {print $2}')"
 echo "Disk: $(df -h / | awk 'NR==2 {print $4 " available"}')"
-
-# Show running services
-echo ""
-echo "🔧 Development Services"
-echo "======================"
-echo "SSH: $(systemctl is-active ssh)"
-echo "Fail2ban: $(systemctl is-active fail2ban)"
-echo "UFW: $(sudo ufw status | head -1)"
 
 echo ""
 echo "Ready for development! 🚀"
@@ -481,35 +423,38 @@ echo ""
 echo "=============================================="
 echo "🎯 Next Steps:"
 echo "=============================================="
-echo "1. Set up SSH keys:"
+echo "1. MANUALLY CONFIGURE FIREWALL:"
+echo "   sudo ufw allow ssh"
+echo "   sudo ufw enable"
+echo ""
+echo "2. CONFIGURE FAIL2BAN (optional):"
+echo "   sudo apt install fail2ban"
+echo "   sudo systemctl enable fail2ban"
+echo "   sudo systemctl start fail2ban"
+echo ""
+echo "3. Set up SSH keys:"
 echo "   Run: ~/scripts/generate-ssh-key.sh"
 echo ""
-echo "2. Configure SSH for remote access:"
+echo "4. Configure SSH for remote access:"
 echo "   - Edit /etc/ssh/sshd_config (see docs/ssh-configuration.md)"
 echo "   - Copy your public key to authorized_keys"
 echo ""
-echo "3. Install VS Code Remote-SSH extension on your local machine"
+echo "5. Install VS Code Remote-SSH extension on your local machine"
 echo ""
-echo "4. Create your first Python project:"
+echo "6. Create your first Python project:"
 echo "   Run: ~/scripts/new-python-project.sh myproject"
 echo ""
-echo "5. Check development environment:"
+echo "7. Check development environment:"
 echo "   Run: ~/scripts/dev-env.sh"
 echo ""
 echo "=============================================="
-echo "📚 Documentation:"
+echo "🔥 FIREWALL WARNING:"
 echo "=============================================="
-echo "- Server setup: Complete ✅"
-echo "- SSH configuration: See docs/ssh-configuration.md"
-echo "- VS Code Remote: See docs/vscode-remote.md"
-echo "- Python environment: See docs/python-environment.md"
-echo ""
-echo "🔧 Useful commands:"
-echo "- Update system: sudo apt update && sudo apt upgrade"
-echo "- Check services: systemctl status ssh fail2ban"
-echo "- Monitor system: htop"
-echo "- Check firewall: sudo ufw status"
-echo "- View SSH logs: sudo tail -f /var/log/auth.log"
+echo "This script skipped firewall configuration for safety."
+echo "Please configure UFW manually:"
+echo "1. sudo ufw allow ssh"
+echo "2. sudo ufw enable"
+echo "3. Make sure you can still connect via SSH!"
 echo ""
 echo "Your Ubuntu 24.04 development server is ready! 🚀"
 
