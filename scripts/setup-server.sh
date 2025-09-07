@@ -74,6 +74,9 @@ if ! command -v poetry &> /dev/null; then
     curl -sSL https://install.python-poetry.org | python3 -
     echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
     export PATH="$HOME/.local/bin:$PATH"
+    # Ensure pipx path is also in PATH
+    python3 -m pipx ensurepath
+    source ~/.bashrc 2>/dev/null || true
 fi
 
 # Install Node.js 20.x LTS
@@ -99,20 +102,28 @@ mkdir -p ~/projects
 mkdir -p ~/scripts
 mkdir -p ~/.local/bin
 
-# Install Python development tools
-print_status "Installing Python development packages..."
-pip3 install --user \
-    black \
-    flake8 \
-    pylint \
-    mypy \
-    pytest \
-    jupyter \
-    ipython \
-    requests \
-    fastapi \
-    uvicorn \
-    pre-commit
+# Install pipx for Python tools management
+print_status "Installing pipx for Python package management..."
+sudo apt install -y python3-pipx python3-full
+python3 -m pipx ensurepath
+
+# Install Python development tools using pipx
+print_status "Installing Python development packages using pipx..."
+pipx install black
+pipx install flake8
+pipx install pylint
+pipx install mypy
+pipx install pytest
+pipx install jupyter
+pipx install ipython
+pipx install pre-commit
+pipx install poetry
+
+# Install some packages via apt that are available
+print_status "Installing additional Python packages via apt..."
+sudo apt install -y \
+    python3-requests \
+    python3-pip
 
 # Configure firewall
 print_status "Configuring firewall..."

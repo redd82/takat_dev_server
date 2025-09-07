@@ -19,6 +19,24 @@ This guide covers:
 
 ## Quick Start
 
+### If you encounter "externally-managed-environment" error:
+
+Ubuntu 24.04 implements PEP 668 to prevent system Python corruption. Run this fix first:
+
+```bash
+curl -sSL https://raw.githubusercontent.com/yourusername/takat_dev_server/main/scripts/fix-python-environment.sh | bash
+```
+
+Or download and run manually:
+```bash
+wget https://github.com/yourusername/takat_dev_server/raw/main/scripts/fix-python-environment.sh
+chmod +x fix-python-environment.sh
+./fix-python-environment.sh
+source ~/.bashrc
+```
+
+### Full Server Setup
+
 1. **Server Setup**: Run the provided setup script on your Ubuntu server
 2. **SSH Configuration**: Configure SSH keys and connection
 3. **VS Code Setup**: Install Remote-SSH extension and connect

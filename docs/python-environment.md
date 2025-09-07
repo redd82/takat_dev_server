@@ -1,8 +1,49 @@
-# Python Development Environment Setup
+# Python Development Environment Setup (Ubuntu 24.04)
+
+**Important Note for Ubuntu 24.04**: Due to PEP 668, Ubuntu 24.04 prevents installing packages directly to the system Python. This guide uses modern best practices with `pipx` for tools and virtual environments for projects.
 
 ## Python Environment Management
 
-### 1. Virtual Environment Setup
+### 1. Understanding Python Package Management in Ubuntu 24.04
+
+Ubuntu 24.04 implements PEP 668 to prevent system Python corruption. Here's the recommended approach:
+
+- **System packages**: Use `apt install python3-package-name`
+- **Development tools**: Use `pipx install tool-name` 
+- **Project dependencies**: Use virtual environments (`venv`, `poetry`, `conda`)
+- **Never use**: `pip install --user` or `pip install` without virtual environment
+
+### 2. Setting Up Development Tools
+
+#### Install pipx (if not already installed)
+```bash
+sudo apt install -y python3-pipx python3-full
+python3 -m pipx ensurepath
+source ~/.bashrc
+```
+
+#### Install development tools with pipx
+```bash
+# Code formatting and linting
+pipx install black
+pipx install flake8
+pipx install pylint
+pipx install mypy
+
+# Testing
+pipx install pytest
+pipx install pytest-cov
+
+# Development tools
+pipx install pre-commit
+pipx install jupyter
+pipx install ipython
+
+# Package management
+pipx install poetry
+```
+
+### 3. Virtual Environment Setup
 
 #### Using venv (built-in)
 ```bash
@@ -67,7 +108,7 @@ conda env export > environment.yml
 conda env create -f environment.yml
 ```
 
-### 2. Project Structure Template
+### 4. Project Structure Template
 
 Create a standard Python project structure:
 ```bash
@@ -90,7 +131,7 @@ touch .gitignore
 touch .env.example
 ```
 
-### 3. Essential Configuration Files
+### 5. Essential Configuration Files
 
 #### pyproject.toml (Poetry)
 ```toml
