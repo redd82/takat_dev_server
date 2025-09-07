@@ -1,6 +1,17 @@
 #!/bin/bash
 
-# Fix for Ubuntu 24.04 PEP 668 externally-managed-environment error
+# Fix for Ubuntu 24.04 PEPprint_status "Installing pipx from universe repository..."
+if sudo DEBIAN_FRONTEND=noninteractive apt install -y pipx; then
+    print_status "pipx installed successfully from repository"
+    pipx ensurepath
+    export PATH="$HOME/.local/bin:$PATH"
+    PIPX_AVAILABLE=true
+else
+    print_warning "pipx repository installation failed, using fallback method"
+    # Fallback: install system packages
+    sudo DEBIAN_FRONTEND=noninteractive apt install -y python3-poetry python3-black python3-flake8 python3-pytest python3-mypy
+    PIPX_AVAILABLE=false
+filly-managed-environment error
 # Run this print_status "Installing system Python packages..."
 sudo apt install -y python3-requests
 
@@ -31,10 +42,11 @@ print_error() {
 }
 
 print_status "Installing prerequisites for Python package management..."
+export DEBIAN_FRONTEND=noninteractive
 sudo apt update
 sudo add-apt-repository universe -y
 sudo apt update
-sudo apt install -y python3-full python3-venv python3-pip
+sudo DEBIAN_FRONTEND=noninteractive apt install -y python3-full python3-venv python3-pip
 
 print_status "Installing pipx from universe repository..."
 if sudo apt install -y pipx; then

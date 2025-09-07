@@ -40,13 +40,14 @@ echo ""
 
 # Update system
 print_status "Updating system packages and enabling universe repository..."
+export DEBIAN_FRONTEND=noninteractive
 sudo apt update && sudo apt upgrade -y
 sudo add-apt-repository universe -y
 sudo apt update
 
 # Install essential development tools
 print_status "Installing essential development tools..."
-sudo apt install -y \
+sudo DEBIAN_FRONTEND=noninteractive apt install -y \
     curl \
     wget \
     git \
@@ -65,7 +66,7 @@ sudo apt install -y \
 
 # Install Python and development tools
 print_status "Installing Python development tools..."
-sudo apt install -y \
+sudo DEBIAN_FRONTEND=noninteractive apt install -y \
     python3 \
     python3-pip \
     python3-venv \
@@ -76,7 +77,7 @@ sudo apt install -y \
 
 # Install pipx from universe repository (Ubuntu 24.04 compatible)
 print_status "Installing pipx from universe repository..."
-if sudo apt install -y pipx; then
+if sudo DEBIAN_FRONTEND=noninteractive apt install -y pipx; then
     print_status "pipx installed successfully from repository"
     pipx ensurepath
     export PATH="$HOME/.local/bin:$PATH"
@@ -92,7 +93,7 @@ if [ "$PIPX_AVAILABLE" = true ] && command -v pipx &> /dev/null; then
     pipx install poetry || sudo apt install -y python3-poetry
 elif ! command -v poetry &> /dev/null; then
     # Try system package first, then fallback to official installer
-    if ! sudo apt install -y python3-poetry; then
+    if ! sudo DEBIAN_FRONTEND=noninteractive apt install -y python3-poetry; then
         curl -sSL https://install.python-poetry.org | python3 -
         echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
         export PATH="$HOME/.local/bin:$PATH"
@@ -126,16 +127,16 @@ mkdir -p ~/.local/bin
 print_status "Installing Python development packages..."
 if [ "$PIPX_AVAILABLE" = true ] && command -v pipx &> /dev/null; then
     print_status "Installing development tools via pipx..."
-    pipx install black || sudo apt install -y python3-black
-    pipx install flake8 || sudo apt install -y python3-flake8
-    pipx install pylint || sudo apt install -y python3-pylint
-    pipx install mypy || sudo apt install -y python3-mypy
-    pipx install pytest || sudo apt install -y python3-pytest
-    pipx install jupyter || sudo apt install -y python3-jupyter-core
+    pipx install black || sudo DEBIAN_FRONTEND=noninteractive apt install -y python3-black
+    pipx install flake8 || sudo DEBIAN_FRONTEND=noninteractive apt install -y python3-flake8
+    pipx install pylint || sudo DEBIAN_FRONTEND=noninteractive apt install -y python3-pylint
+    pipx install mypy || sudo DEBIAN_FRONTEND=noninteractive apt install -y python3-mypy
+    pipx install pytest || sudo DEBIAN_FRONTEND=noninteractive apt install -y python3-pytest
+    pipx install jupyter || sudo DEBIAN_FRONTEND=noninteractive apt install -y python3-jupyter-core
     pipx install pre-commit || echo "pre-commit will be available via pip in virtual environments"
 else
     print_status "Installing development tools via system packages..."
-    sudo apt install -y \
+    sudo DEBIAN_FRONTEND=noninteractive apt install -y \
         python3-black \
         python3-flake8 \
         python3-pylint \
@@ -146,7 +147,7 @@ fi
 
 # Install some packages via apt that are available
 print_status "Installing additional Python packages via apt..."
-sudo apt install -y \
+sudo DEBIAN_FRONTEND=noninteractive apt install -y \
     python3-requests
 
 # Increase file watchers for development tools
@@ -156,8 +157,9 @@ sudo sysctl -p
 
 # Enable unattended upgrades for security
 print_status "Enabling automatic security updates..."
-sudo apt install -y unattended-upgrades
-sudo dpkg-reconfigure -plow unattended-upgrades
+sudo DEBIAN_FRONTEND=noninteractive apt install -y unattended-upgrades
+echo 'unattended-upgrades unattended-upgrades/enable_auto_updates boolean true' | sudo debconf-set-selections
+sudo dpkg-reconfigure -f noninteractive unattended-upgrades
 
 # Create useful aliases
 print_status "Setting up useful aliases..."

@@ -48,6 +48,7 @@ echo ""
 
 # Update system
 print_status "Updating system packages and enabling universe repository..."
+export DEBIAN_FRONTEND=noninteractive
 sudo apt update && sudo apt upgrade -y
 sudo add-apt-repository universe -y
 sudo apt update
