@@ -24,12 +24,12 @@ This guide covers:
 Ubuntu 24.04 implements PEP 668 to prevent system Python corruption. Run this fix first:
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/yourusername/takat_dev_server/main/scripts/fix-python-environment.sh | bash
+curl -sSL https://raw.githubusercontent.com/redd82/takat_dev_server/main/scripts/fix-python-environment.sh | bash
 ```
 
 Or download and run manually:
 ```bash
-wget https://github.com/yourusername/takat_dev_server/raw/main/scripts/fix-python-environment.sh
+wget https://github.com/redd82/takat_dev_server/raw/main/scripts/fix-python-environment.sh
 chmod +x fix-python-environment.sh
 ./fix-python-environment.sh
 source ~/.bashrc
