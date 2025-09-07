@@ -22,10 +22,12 @@ print_warning() {
 }
 
 print_status "Installing pipx for proper Python package management..."
-sudo apt install -y python3-pipx python3-full
+sudo apt install -y python3-full python3-venv
+python3 -m pip install --user pipx
 
 print_status "Ensuring pipx is in PATH..."
 python3 -m pipx ensurepath
+export PATH="$HOME/.local/bin:$PATH"
 
 print_status "Installing development tools with pipx..."
 
@@ -44,7 +46,7 @@ tools=(
 
 for tool in "${tools[@]}"; do
     echo "Installing $tool..."
-    if pipx install "$tool"; then
+    if python3 -m pipx install "$tool"; then
         echo "✅ $tool installed successfully"
     else
         echo "⚠️  Failed to install $tool (may already be installed)"

@@ -74,8 +74,8 @@ if ! command -v poetry &> /dev/null; then
     curl -sSL https://install.python-poetry.org | python3 -
     echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
     export PATH="$HOME/.local/bin:$PATH"
-    # Ensure pipx path is also in PATH
-    python3 -m pipx ensurepath
+    # Install poetry via pipx as well for consistency
+    python3 -m pipx install poetry 2>/dev/null || true
     source ~/.bashrc 2>/dev/null || true
 fi
 
@@ -104,20 +104,21 @@ mkdir -p ~/.local/bin
 
 # Install pipx for Python tools management
 print_status "Installing pipx for Python package management..."
-sudo apt install -y python3-pipx python3-full
+sudo apt install -y python3-full python3-venv
+python3 -m pip install --user pipx
 python3 -m pipx ensurepath
+export PATH="$HOME/.local/bin:$PATH"
 
 # Install Python development tools using pipx
 print_status "Installing Python development packages using pipx..."
-pipx install black
-pipx install flake8
-pipx install pylint
-pipx install mypy
-pipx install pytest
-pipx install jupyter
-pipx install ipython
-pipx install pre-commit
-pipx install poetry
+python3 -m pipx install black
+python3 -m pipx install flake8
+python3 -m pipx install pylint
+python3 -m pipx install mypy
+python3 -m pipx install pytest
+python3 -m pipx install jupyter
+python3 -m pipx install ipython
+python3 -m pipx install pre-commit
 
 # Install some packages via apt that are available
 print_status "Installing additional Python packages via apt..."

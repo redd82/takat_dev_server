@@ -17,7 +17,8 @@ Ubuntu 24.04 implements PEP 668 to prevent system Python corruption. Here's the 
 
 #### Install pipx (if not already installed)
 ```bash
-sudo apt install -y python3-pipx python3-full
+sudo apt install -y python3-full python3-venv
+python3 -m pip install --user pipx
 python3 -m pipx ensurepath
 source ~/.bashrc
 ```
@@ -25,22 +26,22 @@ source ~/.bashrc
 #### Install development tools with pipx
 ```bash
 # Code formatting and linting
-pipx install black
-pipx install flake8
-pipx install pylint
-pipx install mypy
+python3 -m pipx install black
+python3 -m pipx install flake8
+python3 -m pipx install pylint
+python3 -m pipx install mypy
 
 # Testing
-pipx install pytest
-pipx install pytest-cov
+python3 -m pipx install pytest
+python3 -m pipx install pytest-cov
 
 # Development tools
-pipx install pre-commit
-pipx install jupyter
-pipx install ipython
+python3 -m pipx install pre-commit
+python3 -m pipx install jupyter
+python3 -m pipx install ipython
 
 # Package management
-pipx install poetry
+python3 -m pipx install poetry
 ```
 
 ### 3. Virtual Environment Setup
