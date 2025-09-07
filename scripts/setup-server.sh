@@ -34,8 +34,10 @@ if [[ $EUID -eq 0 ]]; then
 fi
 
 # Update system
-print_status "Updating system packages..."
+print_status "Updating system packages and enabling universe repository..."
 sudo apt update && sudo apt upgrade -y
+sudo add-apt-repository universe -y
+sudo apt update
 
 # Install essential development tools
 print_status "Installing essential development tools..."
@@ -66,17 +68,32 @@ sudo apt install -y \
     python3-venv \
     python3-dev \
     python3-setuptools \
-    python3-wheel
+    python3-wheel \
+    python3-full
+
+# Install pipx from universe repository (Ubuntu 24.04 compatible)
+print_status "Installing pipx from universe repository..."
+if sudo apt install -y pipx; then
+    print_status "pipx installed successfully from repository"
+    pipx ensurepath
+    export PATH="$HOME/.local/bin:$PATH"
+    PIPX_AVAILABLE=true
+else
+    print_warning "pipx repository installation failed, will use system packages"
+    PIPX_AVAILABLE=false
+fi
 
 # Install Poetry for Python package management
 print_status "Installing Poetry..."
-if ! command -v poetry &> /dev/null; then
-    curl -sSL https://install.python-poetry.org | python3 -
-    echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
-    export PATH="$HOME/.local/bin:$PATH"
-    # Install poetry via pipx as well for consistency
-    python3 -m pipx install poetry 2>/dev/null || true
-    source ~/.bashrc 2>/dev/null || true
+if [ "$PIPX_AVAILABLE" = true ] && command -v pipx &> /dev/null; then
+    pipx install poetry || sudo apt install -y python3-poetry
+elif ! command -v poetry &> /dev/null; then
+    # Try system package first, then fallback to official installer
+    if ! sudo apt install -y python3-poetry; then
+        curl -sSL https://install.python-poetry.org | python3 -
+        echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+        export PATH="$HOME/.local/bin:$PATH"
+    fi
 fi
 
 # Install Node.js 20.x LTS
@@ -102,29 +119,32 @@ mkdir -p ~/projects
 mkdir -p ~/scripts
 mkdir -p ~/.local/bin
 
-# Install pipx for Python tools management
-print_status "Installing pipx for Python package management..."
-sudo apt install -y python3-full python3-venv
-python3 -m pip install --user pipx
-python3 -m pipx ensurepath
-export PATH="$HOME/.local/bin:$PATH"
-
-# Install Python development tools using pipx
-print_status "Installing Python development packages using pipx..."
-python3 -m pipx install black
-python3 -m pipx install flake8
-python3 -m pipx install pylint
-python3 -m pipx install mypy
-python3 -m pipx install pytest
-python3 -m pipx install jupyter
-python3 -m pipx install ipython
-python3 -m pipx install pre-commit
+# Install Python development tools
+print_status "Installing Python development packages..."
+if [ "$PIPX_AVAILABLE" = true ] && command -v pipx &> /dev/null; then
+    print_status "Installing development tools via pipx..."
+    pipx install black || sudo apt install -y python3-black
+    pipx install flake8 || sudo apt install -y python3-flake8
+    pipx install pylint || sudo apt install -y python3-pylint
+    pipx install mypy || sudo apt install -y python3-mypy
+    pipx install pytest || sudo apt install -y python3-pytest
+    pipx install jupyter || sudo apt install -y python3-jupyter-core
+    pipx install pre-commit || echo "pre-commit will be available via pip in virtual environments"
+else
+    print_status "Installing development tools via system packages..."
+    sudo apt install -y \
+        python3-black \
+        python3-flake8 \
+        python3-pylint \
+        python3-mypy \
+        python3-pytest \
+        python3-jupyter-core
+fi
 
 # Install some packages via apt that are available
 print_status "Installing additional Python packages via apt..."
 sudo apt install -y \
-    python3-requests \
-    python3-pip
+    python3-requests
 
 # Configure firewall
 print_status "Configuring firewall..."
