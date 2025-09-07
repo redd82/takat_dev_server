@@ -11,6 +11,7 @@ echo "=============================================="
 # Colors for output
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
+RED='\033[0;31m'
 NC='\033[0m'
 
 print_status() {
@@ -21,13 +22,20 @@ print_warning() {
     echo -e "${YELLOW}[WARNING]${NC} $1"
 }
 
-print_status "Installing pipx for proper Python package management..."
-sudo apt install -y python3-full python3-venv
+print_error() {
+    echo -e "${RED}[ERROR]${NC} $1"
+}
+
+print_status "Installing prerequisites for Python package management..."
+sudo apt update
+sudo apt install -y python3-full python3-venv python3-pip
+
+print_status "Installing pipx using pip..."
 python3 -m pip install --user pipx
 
 print_status "Ensuring pipx is in PATH..."
-python3 -m pipx ensurepath
 export PATH="$HOME/.local/bin:$PATH"
+python3 -m pipx ensurepath
 
 print_status "Installing development tools with pipx..."
 
